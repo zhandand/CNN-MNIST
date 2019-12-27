@@ -1,12 +1,14 @@
 import csv
 import pandas as pd
 
-df = pd.read_csv("mnist-in-csv\mnist_train.csv",index_)
-def write_data(index,label):
-    with open("mnist-in-csv\mnist_train.csv", "r", encoding="utf-8")as f:
-        reader = csv.reader(f)
-        writer = csv.DictWriter(f,fieldnames="label")
-        data =
-        writer.writerow({"label":label})
 
-write_data(1,"11")
+def attach_label(df,index,label):
+    root = "mnist-in-csv\mnist_train.csv"
+    df = pd.read_csv(root, header=None)
+    print(df)
+    df.loc[1:1,index] = [str(label)]
+    df.to_csv(root, index=False, header=False)
+    df = pd.read_csv(root, header=None)
+    print(df)
+
+attach_label(0,5)

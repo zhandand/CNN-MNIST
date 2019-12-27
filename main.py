@@ -39,9 +39,9 @@ def parse_data():
 
 # get label and img
 def get_data(data):
-    label = data[0]
+    label = data[1]
     label = int(label)
-    img = data[1:]
+    img = data[2:]
     img = list(map(float, img))
     label,img=numpy.array(label),numpy.array(img)
     if use_GPU:
