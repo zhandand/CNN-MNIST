@@ -4,27 +4,8 @@ import torch.nn as nn
 import numpy
 import csv
 from utils.config import *
-
-# parsing data from csv file
-def parse_data():
-    with open("mnist-in-csv\mnist_train.csv", "r", encoding="utf-8")as f:
-        reader = csv.reader(f)
-        rows= [row for row in reader]
-        del(rows[0])
-    return rows
-
-
-# get label and img
-def get_data(data):
-    label = data[0]
-    label = int(label)
-    img = data[1:]
-    img = [pixel.lstrip() for pixel in img ]
-    img = list(map(int, img))
-    label,img=numpy.array(label),numpy.array(img)
-    if use_GPU:
-        label ,img = torch.from_numpy(label),torch.from_numpy(img)
-    return img.view(1,1,28,28),label
+from utils.CSV_Set import CSVSet
+import torch.utils.data
 
 class Model(nn.Module):
 
@@ -46,10 +27,25 @@ class Model(nn.Module):
         x =self.dense(x)
         return x
 
-whole_data =parse_data()
-train_loader = whole_data[:train_split]
-validation_loader = whole_data[train_split:supervise_split]
-unsup_loader =  whole_data[supervise_split:]
+
+train_indices,val_indices,unsup_indices = indices[:train_split],indices[train_split:supervise_split],indices[supervise_split:]
+
+
+train_sampler = torch.utils.data.SubsetRandomSampler(train_indices)
+validation_sampler = torch.utils.data.SubsetRandomSampler(val_indices)
+unsup_sampler  =torch.utils.data.SubsetRandomSampler(unsup_indices)
+
+dataset = CSVSet(fileUrl)
+
+train_loader = torch.utils.data.DataLoader(dataset=dataset,
+                                           batch_size=batch_size,
+                                           sampler=train_sampler)
+validation_loader = torch.utils.data.DataLoader(dataset=dataset,
+                                           batch_size=batch_size,
+                                           sampler=validation_sampler)
+unsup_loader =  torch.utils.data.DataLoader(dataset=dataset,
+                                           batch_size=batch_size,
+                                           sampler=unsup_sampler)
 
 
 

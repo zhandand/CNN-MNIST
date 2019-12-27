@@ -16,19 +16,22 @@ cost = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters())
 model.load_state_dict(torch.load('model_parameter.pkl'))
 
-df = pd.read_csv(root, header=None)
 
-i=1
+index = supervise_split
 for data in unsup_loader:
-    img,label=get_data(data)
-    img,label=img.cuda().float(),label.cuda().long()
-    label = label.unsqueeze(0)
+    df = pd.read_csv(root, header=None, low_memory=False)
+    img,true_label=data
     outputs = model(img)
-    pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
-    attach_label(df,supervise_split+i,pred.item())
-    if i%1000==0:
-        write_to_file(df)
-        df = pd.read_csv(root, header=None)
+    pred = torch.max(outputs.data, 1)[1].cuda().squeeze().cpu()
 
-write_to_file(df)
+    for write_circle in range(10):
+        for i in range(10):
+            index += 1
+            label = pred[i].item()
+            true_l = true_label[i].item()
+            print(index,label,true_l)
+            attach_label(df, index, label)
+    write_to_file(df)
+
+
 

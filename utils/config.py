@@ -6,11 +6,11 @@ Shuffle_dataset = True
 random_Seed = 14
 supervise_rate = 0.2
 train_rate = 0.8
-batch_size = 1
+batch_size = 50
 num_workers = 0
 dataset_size=60000
-use_GPU = True
 root = "mnist-in-csv\mnist_train.csv"
+fileUrl = "D:\study\Code\python_codes\CNN\mnist-in-csv\mnist_train.csv"
 
 indices = list(range(dataset_size))
 supervise_split = math.floor(supervise_rate*dataset_size)

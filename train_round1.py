@@ -9,26 +9,14 @@ import torch.utils
 import torch.utils.data
 from utils.config import *
 from utils.Net import *
-import math
 import csv
 
-
-transform = transforms.Compose([
-     transforms.ToTensor(),
-
-    transforms.Normalize([0.5],[0.5])])
-
-
-whole_data =parse_data()
-train_loader = whole_data[:train_split]
-validation_loader = whole_data[train_split:supervise_split]
-unsup_loader =  whole_data[supervise_split:]
 
 model = Model()
 model.cuda()
 cost = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters())
-model.load_state_dict(torch.load('model_parameter.pkl'))
+# model.load_state_dict(torch.load('model_parameter.pkl'))
 
 
 for epoch in range(n_epochs):
@@ -39,10 +27,7 @@ for epoch in range(n_epochs):
     print("-"*10)
     i = 0
     for data in train_loader:
-        x_train,y_train = get_data(data)
-        x_train,y_train=x_train.cuda().float(),y_train.cuda().long()
-        y_train = y_train.unsqueeze(0)
-        # x_train,y_train = Variable(x_train),Variable(y_train)
+        x_train,y_train = data
 
         outputs = model(x_train)
 
@@ -50,7 +35,7 @@ for epoch in range(n_epochs):
 
         optimizer.zero_grad()
 
-        loss = cost(outputs,y_train.long())
+        loss = cost(outputs,y_train)
 
         try:
             loss.backward()
@@ -64,20 +49,19 @@ for epoch in range(n_epochs):
 
         optimizer.step()
         running_loss+=loss.item()
-        running_correct +=torch.sum(pred==y_train.item()).long()
+        running_correct +=torch.sum(pred==y_train).long()
         i += 1
-        if i == 500:
-            print("Example" + str(i) + " Running correct:"+str(running_correct))
+        if i % 10==0:
+            print("trained " + str(i*batch_size) + " Training Accuracy:"+str(running_correct.item()/(i*batch_size)))
 
 
     testing_correct = (0.0)
     for data in validation_loader:
-        x_test,y_test = get_data(data)
-        x_test,y_test=x_test.cuda().float(),y_test.cuda().long()
-        y_test = y_test.unsqueeze(0)
+        x_test,y_test = data
+        x_test,y_test=x_test.cuda(),y_test.cuda()
         outputs = model(x_test)
         pred = torch.max(outputs.data,1)[1].cuda().squeeze()
-        testing_correct += torch.sum(pred==y_test.item()).long()
+        testing_correct += torch.sum(pred==y_test)
 
     print("Loss is:{:.4f}, Train Accuracy is:"
           "{:.4f}%, Test Accuracy is:{:.4f}%".format(running_loss / train_split,
