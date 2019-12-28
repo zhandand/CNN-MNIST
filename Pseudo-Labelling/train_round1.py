@@ -65,18 +65,18 @@ for epoch in range(n_epochs):
     print("Loss is:{:.4f}, Train Accuracy is:"
           "{:.4f}%, Test Accuracy is:{:.4f}%".format(100 * running_loss / train_size,
                                                      100 * running_correct.item() / (train_size),
-                                                     testing_correct.item() / (validation_size)))
+                                                     100 * testing_correct.item() / (validation_size)))
     torch.save(model.state_dict(), "model_parameter.pkl")
 
-    testing_correct2 = (0.0)
+    testing_correct = (0.0)
     for data in unsup_loader:
         x_test, y_test = data
         outputs = model(x_test)
         pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
-        testing_correct2 += torch.sum(pred == y_test)
+        testing_correct += torch.sum(pred == y_test)
     print(unsup_size)
-    print("Test Accuracy is:{:.4f}%".format(
-        100 * testing_correct2.item() / unsup_size))
+    print("Unsup Accuracy is:{:.4f}%".format(
+        100 * testing_correct.item() / unsup_size))
 
 # X_test, y_test = next(iter(validation_loader))
 # X_test,y_test = X_test.cuda(),y_test.cuda()

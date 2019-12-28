@@ -78,21 +78,27 @@ generate_dataset = CSVSet("D:\study\Code\python_codes\CNN\Pseudo-Labelling\mnist
 
 round2_dataset = torch.utils.data.ConcatDataset([supervise_dataset, generate_dataset])
 
-train_index = []
-size = dataset_size * train_rate
-i = 0
-while (1):
-    if i == size:
-        break
-    index = numpy.random.randint(0, dataset_size, dtype=int)
-    if index not in train_index:
-        train_index.append(index)
-        i += 1
 
-validaton_index = []
-for index in range(dataset_size):
-    if index not in train_index:
-        validaton_index.append(index)
+def shuffle_dataset():
+    train_index = []
+    size = dataset_size * train_rate
+    i = 0
+    while (1):
+        if i == size:
+            break
+        index = numpy.random.randint(0, dataset_size, dtype=int)
+        if index not in train_index:
+            train_index.append(index)
+            i += 1
+
+    validaton_index = []
+    for index in range(dataset_size):
+        if index not in train_index:
+            validaton_index.append(index)
+    return train_index, validaton_index
+
+
+train_index, validaton_index = shuffle_dataset()
 
 round2_train_dataset = torch.utils.data.Subset(dataset=round2_dataset,
                                                indices=train_index)

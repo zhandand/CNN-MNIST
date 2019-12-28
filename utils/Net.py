@@ -4,7 +4,7 @@ import torch.utils.data
 
 class Model(nn.Module):
 
-    def __init__(self):
+    def __init__(self, cost=nn.CrossEntropyLoss(), ):
         super(Model,self).__init__()
         self.conv1 = nn.Sequential(nn.Conv2d(1,64,kernel_size=3,stride=1,padding=1),
                                    nn.ReLU(),
