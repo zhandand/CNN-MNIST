@@ -12,7 +12,12 @@ generate_label = []
 
 test_size = 0
 
-# for data in unsup_loader:
+for data in unsup_loader:
+    img, true_label = data
+    outputs = model(img)
+    pred = torch.max(outputs.data, 1)[1].cuda().squeeze().cpu()
+    generate_label.extend(pred)
+
 #     test_size+=batch_size
 #     x_test, y_test = data
 #     outputs = model(x_test)
@@ -23,17 +28,13 @@ test_size = 0
 # for i in range(batch_size):
 
 
-# img, true_label = data
-# outputs = model(img)
-# pred = torch.max(outputs.data, 1)[1].cuda().squeeze().cpu()
-# generate_label.extend(pred)
-# true_l = true_label[i].item()
-# print(pred[i].item(),true_l)
+
 
 print("generate labels finished")
 
 generate_label = [label.numpy().item() for label in generate_label]
+
 original_img = dataset.getImg()
 
-# label_to_file(generate_label,original_img,generate_file="mnist_generate.csv")
+label_to_file(generate_label, original_img, generate_file="mnist_generate.csv")
 print("write to file finished")
