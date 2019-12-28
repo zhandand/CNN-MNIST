@@ -1,7 +1,8 @@
-from keras.datasets import mnist
 from keras import utils
+from keras.datasets import mnist
 
 path = "D:\study\Code\python_codes\CNN\data\mnist.npz"
+
 
 def load_mnist():
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data(path=path)
@@ -11,6 +12,7 @@ def load_mnist():
     Y_test = utils.to_categorical(Y_test, num_classes=10)
     return X_train, Y_train, X_test, Y_test
 
+
 def write_performance(perf, filename):
     with open(filename, 'a+') as f:
         text = 'iter\tbest_pop\tbest_loss\tbest_acc\tavg_fitness\n'
@@ -18,4 +20,3 @@ def write_performance(perf, filename):
             text += ('\t'.join(list(map(str, [e['iter'], e['best_fit']['pop'], e['best_fit']['train_loss'],
                                               e['best_fit']['train_acc'], e['avg_fitness']]))) + '\n')
         f.write(text)
-

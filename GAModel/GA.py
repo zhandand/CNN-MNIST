@@ -1,28 +1,30 @@
 from abc import abstractmethod
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, AveragePooling2D
-import  numpy as np
+
+import numpy as np
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from keras.models import Sequential
 
+
 class GA:
-    def __init__(self,_X_train,_y_train,_X_test,_y_test,_pop_size,_r_mutation,_p_crossover,_p_mutation,
-                 _max_iter,_min_fitness,_batch_size,_dataset="MNIST"):
-        self.X_train=_X_train
-        self.y_train =_y_train
+    def __init__(self, _X_train, _y_train, _X_test, _y_test, _pop_size, _r_mutation, _p_crossover, _p_mutation,
+                 _max_iter, _min_fitness, _batch_size, _dataset="MNIST"):
+        self.X_train = _X_train
+        self.y_train = _y_train
         self.X_test = _X_test
-        self.y_test =_y_test
-        self.pop_size=_pop_size
+        self.y_test = _y_test
+        self.pop_size = _pop_size
         self.r_mutation = _r_mutation
         self.p_crossover = _p_crossover
         self.p_mutation = _p_mutation
-        self.max_iter =_max_iter
+        self.max_iter = _max_iter
         self.min_fitness = _min_fitness
         self.batch_size = _batch_size
-        self.dataset =_dataset
+        self.dataset = _dataset
         self.chroms = []
-        self.evaluation_history =[]
+        self.evaluation_history = []
         self.stddev = 0.5
         self.loss_func = 'categorical_crossentropy'
-        self.metrics =['accuracy']
+        self.metrics = ['accuracy']
 
     @property
     def cur_iter(self):
@@ -36,16 +38,6 @@ class GA:
     def initialization(self):
         for i in range(self.pop_size):
             model = Sequential()
-            # model.add(Conv2D(40, (1, 1), activation='relu', use_bias=False, input_shape=(28, 28, 1)))
-            # model.add(AveragePooling2D((2, 2)))
-            # model.add(Conv2D(40, (1, 1), activation='relu', use_bias=False))
-            # model.add(AveragePooling2D((2, 2)))
-            # model.add(Conv2D(5, (1, 1), activation='relu', use_bias=False))
-            # model.add(AveragePooling2D((2, 2)))
-            # model.add(Conv2D(1, (1, 1), activation='relu', use_bias=False))
-            # model.add(Flatten())
-            # model.add(Dense(40, activation='relu', use_bias=False))
-            # model.add(Dense(10, activation='softmax', use_bias=False))
             model.add(Conv2D(filters=64, kernel_size=3, strides=(1, 1), activation="relu", padding="same",
                              use_bias=False, input_shape=(28, 28, 1)))
             model.add(Conv2D(filters=128, kernel_size=3, strides=(1, 1), activation="relu",
@@ -55,7 +47,7 @@ class GA:
             model.add(Dense(units=1024, activation="relu", use_bias=False))
             model.add(Dense(units=10, use_bias=False))
             self.chroms.append(model)
-        print("{} network initialization({}) finished.".format(self.dataset,self.pop_size))
+        print("{} network initialization({}) finished.".format(self.dataset, self.pop_size))
 
     def evaluation(self, _X, _y, _is_batch=True):
         cur_evaluation = []
@@ -107,18 +99,16 @@ class GA:
 
     @abstractmethod
     def selection(self):
-        raise  NotImplementedError('Selection not implemented')
+        raise NotImplementedError('Selection not implemented')
 
     @abstractmethod
-    def crossover(self,_selected_pop):
+    def crossover(self, _selected_pop):
         raise NotImplementedError('Crossover not implemented')
 
     @abstractmethod
-    def mutation(self,_selected_pop):
+    def mutation(self, _selected_pop):
         raise NotImplementedError('Mutation not implemented')
 
     @abstractmethod
-    def replacement(self,_child):
+    def replacement(self, _child):
         raise NotImplementedError('Replacement not implemented')
-
-

@@ -1,10 +1,5 @@
-import torchvision
 import torch
 import torch.nn as nn
-import numpy
-import csv
-from utils.config import *
-from utils.CSV_Set import CSVSet
 import torch.utils.data
 
 class Model(nn.Module):
@@ -28,26 +23,7 @@ class Model(nn.Module):
         return x
 
 
-train_indices,val_indices,unsup_indices = indices[:train_split],indices[train_split:supervise_split],indices[supervise_split:]
 
-
-train_sampler = torch.utils.data.SubsetRandomSampler(train_indices)
-validation_sampler = torch.utils.data.SubsetRandomSampler(val_indices)
-unsup_sampler  =torch.utils.data.SubsetRandomSampler(unsup_indices)
-
-dataset = CSVSet(datapath)
-
-loader = torch.utils.data.ConcatDataset()
-
-train_loader = torch.utils.data.DataLoader(dataset=dataset,
-                                           batch_size=batch_size,
-                                           sampler=train_sampler)
-validation_loader = torch.utils.data.DataLoader(dataset=dataset,
-                                           batch_size=batch_size,
-                                           sampler=validation_sampler)
-unsup_loader =  torch.utils.data.DataLoader(dataset=dataset,
-                                           batch_size=batch_size,
-                                           sampler=unsup_sampler)
 
 
 

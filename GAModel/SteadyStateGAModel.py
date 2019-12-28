@@ -1,7 +1,8 @@
-import  numpy as np
+import numpy as np
+from keras.layers import Conv2D, Dense
+from keras.models import Sequential, clone_model
+
 from GAModel import GA
-from keras.layers import Conv2D,Dense
-from keras.models import Sequential,clone_model
 
 
 class SteadyStateGA(GA.GA):
@@ -97,4 +98,3 @@ class SteadyStateGA(GA.GA):
         self.chroms.insert(least_fit_pop, _child)
         print('Replacement({}, fitness: {:.4f}) finished.'
               .format(least_fit_pop, sorted_evaluation[0]['train_acc']))
-

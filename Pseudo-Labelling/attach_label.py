@@ -1,53 +1,39 @@
-import csv
-import pandas as pd
 from utils.Net import *
-import os
-import time
-
-def attach_label(df,index,label):
-
-    df.loc[index,0] = str(label)
-
-
-def write_to_file(df):
-    df.to_csv(root, index=False, header=False)
-
-
-
+from utils.DataMgr import *
 
 model = Model()
 model.cuda()
 cost = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters())
-model.load_state_dict(torch.load('model_parameter.pkl'))
+model.load_state_dict(torch.load('D:\study\Code\python_codes\CNN\\utils\model_parameter.pkl'))
 
-
+testing_correct = (0.0)
 generate_label = []
 
-for data in unsup_loader:
+test_size = 0
 
-    img,true_label=data
-    outputs = model(img)
-    pred = torch.max(outputs.data, 1)[1].cuda().squeeze().cpu()
-    generate_label.extend(pred)
+# for data in unsup_loader:
+#     test_size+=batch_size
+#     x_test, y_test = data
+#     outputs = model(x_test)
+#     pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
+#     testing_correct += torch.sum(pred == y_test)
+#     print("Test Accuracy is:{:.4f}%".format(100.0 * testing_correct.item() /test_size))
+
+# for i in range(batch_size):
+
+
+# img, true_label = data
+# outputs = model(img)
+# pred = torch.max(outputs.data, 1)[1].cuda().squeeze().cpu()
+# generate_label.extend(pred)
+# true_l = true_label[i].item()
+# print(pred[i].item(),true_l)
 
 print("generate labels finished")
 
+generate_label = [label.numpy().item() for label in generate_label]
+original_img = dataset.getImg()
 
-index = supervise_split+1
-df = pd.read_csv(root, header=None, low_memory=False)
-
-for index in range(index,dataset_size):
-    label = generate_label[index].item()
-    attach_label(df,index,label)
-    if (index-supervise_split)%500==0:
-        print("have labeled the"+str(index-supervise_split))
-
-write_to_file(df)
-#     for i in range(batch_size):
-#         index += 1
-#         label = pred[i].item()
-#         true_l = true_label[i].item()
-#         print(index,label,true_l)
-#         attach_label(df, index, label)
-
+# label_to_file(generate_label,original_img,generate_file="mnist_generate.csv")
+print("write to file finished")

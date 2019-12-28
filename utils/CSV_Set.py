@@ -1,14 +1,9 @@
-import torchvision
-import torch
-import numpy
-from torchvision import transforms
-import torch.nn as nn
-import matplotlib.pyplot as plt
 import torch.utils
 import torch.utils.data
-from utils.config import *
 from utils.Net import *
-import pandas as pd
+from utils.DataMgr import *
+import numpy
+import csv
 
 
 class CSVSet(torch.utils.data.Dataset):
@@ -16,7 +11,7 @@ class CSVSet(torch.utils.data.Dataset):
     def __init__(self,fileUrl):
         self.fileUrl = fileUrl
 
-        with open(fileUrl, "r", encoding="utf-8")as f:
+        with open(self.fileUrl, "r", encoding="utf-8")as f:
             self.reader = csv.reader(f)
             self.rows = [row for row in self.reader]
             del (self.rows[0])
@@ -27,8 +22,7 @@ class CSVSet(torch.utils.data.Dataset):
     def __getitem__(self, index):
 
         data = self.rows[index]
-        label = data[0]
-        label = int(label)
+        label = int(data[0])
         img = data[1:]
         img = [pixel.lstrip() for pixel in img]
         img = list(map(int, img))
@@ -40,3 +34,8 @@ class CSVSet(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.rows)
+
+    def getImg(self):
+        imgSet = [img[1:] for img in self.rows[supervise_size + 1:]]
+        print(unsup_indices)
+        return imgSet
