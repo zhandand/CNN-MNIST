@@ -5,9 +5,9 @@ import os
 import time
 
 def attach_label(df,index,label):
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
     df.loc[index,0] = str(label)
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
 
 def write_to_file(df):
     df.to_csv(root, index=False, header=False)
@@ -20,10 +20,6 @@ model.cuda()
 cost = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters())
 model.load_state_dict(torch.load('model_parameter.pkl'))
-
-
-
-
 
 
 generate_label = []
