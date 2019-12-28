@@ -9,8 +9,8 @@ train_rate = 0.8
 batch_size = 50
 num_workers = 0
 dataset_size=60000
-root = "mnist-in-csv\mnist_train.csv"
-fileUrl = "D:\study\Code\python_codes\CNN\mnist-in-csv\mnist_train.csv"
+root = "data\mnist-in-csv\mnist_train.csv"
+datapath = "D:\study\Code\python_codes\CNN\data\mnist-in-csv\mnist_train.csv"
 
 indices = list(range(dataset_size))
 supervise_split = math.floor(supervise_rate*dataset_size)

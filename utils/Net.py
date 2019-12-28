@@ -35,7 +35,7 @@ train_sampler = torch.utils.data.SubsetRandomSampler(train_indices)
 validation_sampler = torch.utils.data.SubsetRandomSampler(val_indices)
 unsup_sampler  =torch.utils.data.SubsetRandomSampler(unsup_indices)
 
-dataset = CSVSet(fileUrl)
+dataset = CSVSet(datapath)
 
 train_loader = torch.utils.data.DataLoader(dataset=dataset,
                                            batch_size=batch_size,
