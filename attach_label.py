@@ -25,7 +25,7 @@ for data in unsup_loader:
     pred = torch.max(outputs.data, 1)[1].cuda().squeeze().cpu()
 
     for write_circle in range(10):
-        for i in range(10):
+        for i in range(batch_size):
             index += 1
             label = pred[i].item()
             true_l = true_label[i].item()
