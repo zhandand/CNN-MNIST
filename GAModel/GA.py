@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from keras.layers import Conv2D,MaxPooling2D,Flatten,Dense
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, AveragePooling2D
 import  numpy as np
 from keras.models import Sequential
 
@@ -20,7 +20,7 @@ class GA:
         self.dataset =_dataset
         self.chroms = []
         self.evaluation_history =[]
-        self.stddex = 0.5
+        self.stddev = 0.5
         self.loss_func = 'categorical_crossentropy'
         self.metrics =['accuracy']
 
@@ -36,11 +36,24 @@ class GA:
     def initialization(self):
         for i in range(self.pop_size):
             model = Sequential()
-            model.add(Conv2D(filters=64, kernel_size=3,strides=(1, 1), activation="relu", padding="same", input_shape=( 28, 28,1)))
-            model.add(Conv2D(filters=128, kernel_size=3,strides=(1, 1), activation="relu", padding="same"))
-            model.add(MaxPooling2D(pool_size=(2,2)))
-            model.add(Dense(units=14*14*128,activation="relu"))
-            model.add(Dense(units=10))
+            # model.add(Conv2D(40, (1, 1), activation='relu', use_bias=False, input_shape=(28, 28, 1)))
+            # model.add(AveragePooling2D((2, 2)))
+            # model.add(Conv2D(40, (1, 1), activation='relu', use_bias=False))
+            # model.add(AveragePooling2D((2, 2)))
+            # model.add(Conv2D(5, (1, 1), activation='relu', use_bias=False))
+            # model.add(AveragePooling2D((2, 2)))
+            # model.add(Conv2D(1, (1, 1), activation='relu', use_bias=False))
+            # model.add(Flatten())
+            # model.add(Dense(40, activation='relu', use_bias=False))
+            # model.add(Dense(10, activation='softmax', use_bias=False))
+            model.add(Conv2D(filters=64, kernel_size=3, strides=(1, 1), activation="relu", padding="same",
+                             use_bias=False, input_shape=(28, 28, 1)))
+            model.add(Conv2D(filters=128, kernel_size=3, strides=(1, 1), activation="relu",
+                             use_bias=False, padding="same"))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
+            model.add(Flatten())
+            model.add(Dense(units=1024, activation="relu", use_bias=False))
+            model.add(Dense(units=10, use_bias=False))
             self.chroms.append(model)
         print("{} network initialization({}) finished.".format(self.dataset,self.pop_size))
 
@@ -49,7 +62,7 @@ class GA:
         for i in range(self.pop_size):
             model = self.chroms[i]
             model.compile(loss=self.loss_func, metrics=self.metrics, optimizer='adam')
-            print("before eval")
+
             train_loss, train_acc = model.evaluate(_X, _y, verbose=0)
             if not _is_batch:
                 test_loss, test_acc = model.evaluate(self.X_test, self.y_test, verbose=0)
@@ -77,14 +90,14 @@ class GA:
         print('Best_fit: {}, avg_fitness: {:.4f}'.format(self.evaluation_history[-1]['best_fit'],
                                                          self.evaluation_history[-1]['avg_fitness']))
 
-    def roulette_Wheel_selection(self):
-        sorted_evaluation = sorted(self.evaluation_history[-1]['evaluation'],key=lambda  x :x['train_acc'])
+    def roulette_wheel_selection(self):
+        sorted_evaluation = sorted(self.evaluation_history[-1]['evaluation'], key=lambda x: x['train_acc'])
         cum_acc = np.array([e['train_acc'] for e in sorted_evaluation]).cumsum()
-        extra_evaluation = [{'pop':e['pop'],'train_Acc':e['train_acc'],'cum_acc':cum_acc}
-                            for e in zip(sorted_evaluation,cum_acc)]
+        extra_evaluation = [{'pop': e['pop'], 'train_acc': e['train_acc'], 'cum_acc': acc}
+                            for e, acc in zip(sorted_evaluation, cum_acc)]
         rand = np.random.rand() * cum_acc[-1]
         for e in extra_evaluation:
-            if rand <e['cum_acc']:
+            if rand < e['cum_acc']:
                 return e['pop']
         return extra_evaluation[-1]['pop']
 

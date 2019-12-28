@@ -3,13 +3,16 @@ from keras.datasets import mnist
 from keras import utils
 from GAModel.DataMgr import *
 from GAModel.SteadyStateGAModel import SteadyStateGA
+import os
 
-# X_train, y_train, X_test, y_test = load_mnist()
-(X_train, Y_train), (X_test, Y_test) = mnist.load_data(path=path)
-X_train = X_train.reshape(X_train.shape[0], 28, 28, 1) / 255
-X_test = X_test.reshape(X_test.shape[0], 28, 28, 1) / 255
-y_train = utils.to_categorical(Y_train, num_classes=10)
-y_test = utils.to_categorical(Y_test, num_classes=10)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+X_train, y_train, X_test, y_test = load_mnist()
+# (X_train, Y_train), (X_test, Y_test) = mnist.load_data(path=path)
+# X_train = X_train.reshape(X_train.shape[0], 28, 28, 1) / 255
+# X_test = X_test.reshape(X_test.shape[0], 28, 28, 1) / 255
+# y_train = utils.to_categorical(Y_train, num_classes=10)
+# y_test = utils.to_categorical(Y_test, num_classes=10)
 train_size = len(X_train)
 test_size = len(X_test)
 
@@ -26,6 +29,7 @@ g = SteadyStateGA(
     _min_fitness=0.95,
     _batch_size=5000,
 )
+g.run()
 
 g.run()
 

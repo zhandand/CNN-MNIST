@@ -7,7 +7,6 @@ from keras.models import Sequential,clone_model
 class SteadyStateGA(GA.GA):
     def run(self):
         print('Steady-state GA is running...')
-
         self.initialization()
         while 1:
             series = self.shuffle_batch()
@@ -23,6 +22,7 @@ class SteadyStateGA(GA.GA):
                 self.replacement(child)
                 if self.cur_iter >= self.max_iter:
                     print('Maximum iterations({}) reached.'.format(self.max_iter))
+
                     return
                 if self.evaluation_history[-1]['best_fit']['train_acc'] >= self.min_fitness:
                     print('Minimum fitness({}) reached.'.format(self.min_fitness))
@@ -32,13 +32,13 @@ class SteadyStateGA(GA.GA):
         if np.random.rand() < self.p_crossover:
             selected_pop = []
             while len(selected_pop) < 2:
-                pop = self.roulette_Wheel_selection()
+                pop = self.roulette_wheel_selection()
                 if pop not in selected_pop:
                     selected_pop.append(pop)
             print('Selected pop: {}'.format(selected_pop))
             return self.crossover(selected_pop)
         else:
-            selected_pop = self.roulette_Wheel_selection()
+            selected_pop = self.roulette_wheel_selection()
             print('Selected pop: {}'.format(selected_pop))
             return self.mutation(selected_pop)
 
@@ -58,7 +58,8 @@ class SteadyStateGA(GA.GA):
                 weights2 = layer2.get_weights()[0]
                 rand1 = np.random.randint(0, 2, weights1.shape[1])  # cols
                 rand2 = 1 - rand1
-                layer1.set_weights([weights1 * rand1 + weights2 * rand2])
+
+                layer1.set_weights([weights1 * rand1 + weights2 * rand2])  # wrong
                 child.add(layer1)
             else:
                 child.add(layer1)
@@ -80,6 +81,7 @@ class SteadyStateGA(GA.GA):
             elif type(layer) is Dense:
                 weights = layer.get_weights()[0]
                 rand = np.where(np.random.rand(weights.shape[1]) < self.r_mutation, 1, 0)
+
                 layer.set_weights([weights + rand * np.random.normal(0, self.stddev, weights.shape)])
                 child.add(layer)
             else:
@@ -95,3 +97,4 @@ class SteadyStateGA(GA.GA):
         self.chroms.insert(least_fit_pop, _child)
         print('Replacement({}, fitness: {:.4f}) finished.'
               .format(least_fit_pop, sorted_evaluation[0]['train_acc']))
+

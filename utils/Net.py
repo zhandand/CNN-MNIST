@@ -37,6 +37,8 @@ unsup_sampler  =torch.utils.data.SubsetRandomSampler(unsup_indices)
 
 dataset = CSVSet(datapath)
 
+loader = torch.utils.data.ConcatDataset()
+
 train_loader = torch.utils.data.DataLoader(dataset=dataset,
                                            batch_size=batch_size,
                                            sampler=train_sampler)

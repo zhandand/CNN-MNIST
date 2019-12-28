@@ -11,11 +11,10 @@ from utils.Net import *
 import pandas as pd
 
 
-class CSVSet(torch.utils.data.DataLoader):
+class CSVSet(torch.utils.data.Dataset):
 
     def __init__(self,fileUrl):
         self.fileUrl = fileUrl
-
 
         with open(fileUrl, "r", encoding="utf-8")as f:
             self.reader = csv.reader(f)
@@ -35,7 +34,7 @@ class CSVSet(torch.utils.data.DataLoader):
         img = list(map(int, img))
         label, img = numpy.array(label), numpy.array(img)
         label, img = torch.from_numpy(label), torch.from_numpy(img)
-        label,img=  label.cuda(),img.cuda()
+        label, img = label.cuda(), img.cuda()
         return img.view(1,28,28).float(), label.long()
 
 
