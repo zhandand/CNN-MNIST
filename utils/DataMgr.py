@@ -5,19 +5,11 @@ import csv
 import numpy
 
 
-
 indices = list(range(dataset_size))
 supervise_size = math.floor(supervise_rate * dataset_size)
 train_size = math.floor(train_rate * supervise_size)
 validation_size = supervise_size - train_size
 unsup_size = dataset_size * (1 - supervise_rate)
-
-train_indices, val_indices, unsup_indices = indices[:train_size], indices[train_size:supervise_size], indices[
-                                                                                                      supervise_size:]
-
-train_sampler = torch.utils.data.SubsetRandomSampler(train_indices)
-validation_sampler = torch.utils.data.SubsetRandomSampler(val_indices)
-unsup_sampler = torch.utils.data.SubsetRandomSampler(unsup_indices)
 
 
 class CSVSet(torch.utils.data.Dataset):
@@ -49,27 +41,33 @@ class CSVSet(torch.utils.data.Dataset):
 
     def getImg(self):
         imgSet = [img[1:] for img in self.rows[supervise_size:]]
-        print(unsup_indices)
         return imgSet
-
 
 dataset = CSVSet(datapath)
 
+train_indices, val_indices, unsup_indices = indices[:train_size], \
+                                            indices[train_size:supervise_size], \
+                                            indices[supervise_size:]
 
-train_loader = torch.utils.data.DataLoader(dataset=dataset,
+train_set = torch.utils.data.Subset(dataset=dataset, indices=train_indices)
+validation_set = torch.utils.data.Subset(dataset=dataset, indices=val_indices)
+unsup_set = torch.utils.data.Subset(dataset=dataset, indices=unsup_indices)
+
+train_loader = torch.utils.data.DataLoader(dataset=train_set,
                                            batch_size=batch_size,
-                                           sampler=train_sampler,
                                            )
 
-validation_loader = torch.utils.data.DataLoader(dataset=dataset,
+validation_loader = torch.utils.data.DataLoader(dataset=validation_set,
                                                 batch_size=batch_size,
-                                                sampler=validation_sampler,
                                                 )
 
-unsup_loader = torch.utils.data.DataLoader(dataset=dataset,
+unsup_loader = torch.utils.data.DataLoader(dataset=unsup_set,
                                            batch_size=batch_size,
-                                           sampler=unsup_sampler,
                                            )
+
+train_sampler1 = torch.utils.data.SubsetRandomSampler(indices[:20000])
+validation_sampler1 = torch.utils.data.SubsetRandomSampler(indices[20000:25000])
+
 
 supervise_dataset = torch.utils.data.Subset(dataset=dataset, indices=indices[:supervise_size])
 
@@ -105,10 +103,10 @@ round2_train_dataset = torch.utils.data.Subset(dataset=round2_dataset,
 round2_validation_dataset = torch.utils.data.Subset(dataset=round2_dataset,
                                                     indices=validaton_index)
 
-round2_train_loader = torch.utils.data.DataLoader(dataset=round2_train_dataset,
-                                                  batch_size=batch_size)
-round2_validation_loader = torch.utils.data.DataLoader(dataset=round2_validation_dataset,
-                                                       batch_size=batch_size)
+round2_train_dataloader = torch.utils.data.DataLoader(dataset=round2_train_dataset,
+                                                      batch_size=batch_size)
+round2_validation_dataloader = torch.utils.data.DataLoader(dataset=round2_validation_dataset,
+                                                           batch_size=batch_size)
 
 def label_to_file(label, img, generate_file):
     data_frame = []

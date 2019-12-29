@@ -16,7 +16,7 @@ model = Model()
 model.cuda()
 cost = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters())
-model.load_state_dict(torch.load('D:\study\Code\python_codes\CNN\Pseudo-Labelling\model_parameter.pkl'))
+# model.load_state_dict(torch.load('D:\study\Code\python_codes\CNN\Pseudo-Labelling\model_parameter.pkl'))
 
 
 for epoch in range(n_epochs):
@@ -37,46 +37,38 @@ for epoch in range(n_epochs):
 
         loss = cost(outputs, y_train)
 
-        try:
-            loss.backward()
-        except RuntimeError as exception:
-            if "out of memory" in str(exception):
-                print("WARNING: out of memory")
-                if hasattr(torch.cuda, 'empty_cache'):
-                    torch.cuda.empty_cache()
-            else:
-                raise exception
+        loss.backward()
 
         optimizer.step()
         running_loss += loss.item()
-        running_correct += torch.sum(pred == y_train).long()
+        running_correct += torch.sum(pred == y_train).item()
         i += 1
-        if i % 10 == 0:
+        if i % 20 == 0:
             print("trained " + str(i * batch_size) + " Training Accuracy:" + str(
-                running_correct.item() / (i * batch_size)))
+                running_correct / (i * batch_size)))
 
     testing_correct = (0.0)
     for data in validation_loader:
         x_test,y_test = data
         outputs = model(x_test)
         pred = torch.max(outputs.data,1)[1].cuda().squeeze()
-        testing_correct += torch.sum(pred == y_test)
+        testing_correct += torch.sum(pred == y_test).item()
 
     print("Loss is:{:.4f}, Train Accuracy is:"
           "{:.4f}%, Test Accuracy is:{:.4f}%".format(100 * running_loss / train_size,
-                                                     100 * running_correct.item() / (train_size),
-                                                     100 * testing_correct.item() / (validation_size)))
+                                                     100 * running_correct / train_size,
+                                                     100 * testing_correct / validation_size))
     torch.save(model.state_dict(), "model_parameter.pkl")
 
-    testing_correct = (0.0)
-    for data in unsup_loader:
-        x_test, y_test = data
-        outputs = model(x_test)
-        pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
-        testing_correct += torch.sum(pred == y_test)
-    print(unsup_size)
-    print("Unsup Accuracy is:{:.4f}%".format(
-        100 * testing_correct.item() / unsup_size))
+# testing_correct = (0.0)
+# for data in unsup_loader:
+#     x_test, y_test = data
+#     outputs = model(x_test)
+#     pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
+#     testing_correct += torch.sum(pred == y_test)
+# print(unsup_size)
+# print("Unsup Accuracy is:{:.4f}%".format(
+#         100 * testing_correct.item() / unsup_size))
 
 # X_test, y_test = next(iter(validation_loader))
 # X_test,y_test = X_test.cuda(),y_test.cuda()

@@ -18,18 +18,6 @@ for data in unsup_loader:
     pred = torch.max(outputs.data, 1)[1].cuda().squeeze().cpu()
     generate_label.extend(pred)
 
-#     test_size+=batch_size
-#     x_test, y_test = data
-#     outputs = model(x_test)
-#     pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
-#     testing_correct += torch.sum(pred == y_test)
-#     print("Test Accuracy is:{:.4f}%".format(100.0 * testing_correct.item() /test_size))
-
-# for i in range(batch_size):
-
-
-
-
 print("generate labels finished")
 
 generate_label = [label.numpy().item() for label in generate_label]

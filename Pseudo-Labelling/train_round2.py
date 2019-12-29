@@ -24,7 +24,7 @@ for epoch in range(n_epochs):
     print("Epoch {}/{}".format(epoch + 1, n_epochs))
     print("-" * 10)
     i = 0
-    for data in round2_train_loader:
+    for data in round2_train_dataloader:
         x_train, y_train = data
 
         outputs = model(x_train)
@@ -34,34 +34,25 @@ for epoch in range(n_epochs):
         optimizer.zero_grad()
 
         loss = cost(outputs, y_train)
-
-        try:
-            loss.backward()
-        except RuntimeError as exception:
-            if "out of memory" in str(exception):
-                print("WARNING: out of memory")
-                if hasattr(torch.cuda, 'empty_cache'):
-                    torch.cuda.empty_cache()
-            else:
-                raise exception
+        loss.backward()
 
         optimizer.step()
         running_loss += loss.item()
-        running_correct += torch.sum(pred == y_train).long()
+        running_correct += torch.sum(pred == y_train).item()
         i += 1
         if i % 10 == 0:
-            print("trained " + str(i * batch_size) + " Training Accuracy:" + str(
-                running_correct.item() / (i * batch_size)))
+            print("trained " + str(i * batch_size) + " Training Accuracy:{.4f}%".format(
+                100 * running_correct / (i * batch_size)))
 
-    testing_correct = (0.0)
-    for data in round2_validation_dataset:
+    testing_correct = 0.0
+    for data in round2_validation_dataloader:
         x_test, y_test = data
         outputs = model(x_test)
         pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
-        testing_correct += torch.sum(pred == y_test)
+        testing_correct += torch.sum(pred == y_test).item()
 
     print("Loss is:{:.4f}, Train Accuracy is:"
-          "{:.4f}%, Test Accuracy is:{:.4f}%".format(100 * running_loss / train_size,
-                                                     100 * running_correct.item() / (train_size),
-                                                     100 * testing_correct.item() / (validation_size)))
+          "{:.4f}%, Test Accuracy is:{:.4f}%".format(100 * running_loss / 48000,
+                                                     100 * running_correct / 48000,
+                                                     100 * testing_correct / 12000))
     torch.save(model.state_dict(), "model_parameter.pkl")

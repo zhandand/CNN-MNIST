@@ -20,7 +20,7 @@ class PLModel:
         self._round2_validation_dataloader = _round2_validation_dataloader
 
     def train_round1(self, parametersName="round1_parameters"):
-        self.train(self.round1_train_dataloader, round2_validation_dataset,
+        self.train(self.round1_train_dataloader, self.round1_validation_dataloader,
                    saveParametersPath='round1_parameters.pkl')
 
     def mark(self):
@@ -40,7 +40,7 @@ class PLModel:
         print("write to file finished")
 
     def train_round2(self):
-        self.train(round2_train_loader, round2_validation_dataset,
+        self.train(round2_train_dataloader, round2_validation_dataset,
                    loadParametersPath='D:\study\Code\python_codes\CNN\Pseudo-Labelling\model_parameter.pkl',
                    saveParametersPath='round2_parameters.pkl')
 
