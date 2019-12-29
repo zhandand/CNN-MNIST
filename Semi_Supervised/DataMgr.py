@@ -1,9 +1,10 @@
 import pandas as pd
-from utils.config import *
+from Semi_Supervised.config import *
 import torch.utils.data
 import csv
 import numpy
-
+import math
+import os
 
 indices = list(range(dataset_size))
 supervise_size = math.floor(supervise_rate * dataset_size)
@@ -12,6 +13,7 @@ validation_size = supervise_size - train_size
 unsup_size = dataset_size * (1 - supervise_rate)
 
 
+# 重写dataloader
 class CSVSet(torch.utils.data.Dataset):
 
     def __init__(self, fileUrl, heading=True):
@@ -39,44 +41,67 @@ class CSVSet(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.rows)
 
+    # 获取'无标签'的图片
     def getImg(self):
         imgSet = [img[1:] for img in self.rows[supervise_size:]]
         return imgSet
 
+
 dataset = CSVSet(datapath)
 
+# 按照一定的比例划分数据集
 train_indices, val_indices, unsup_indices = indices[:train_size], \
                                             indices[train_size:supervise_size], \
                                             indices[supervise_size:]
 
-train_set = torch.utils.data.Subset(dataset=dataset, indices=train_indices)
-validation_set = torch.utils.data.Subset(dataset=dataset, indices=val_indices)
-unsup_set = torch.utils.data.Subset(dataset=dataset, indices=unsup_indices)
 
-train_loader = torch.utils.data.DataLoader(dataset=train_set,
-                                           batch_size=batch_size,
-                                           )
+# 获取第一轮data_loader
+def get_round1_dataloader():
+    _round1_train_set = torch.utils.data.Subset(
+        dataset=dataset, indices=train_indices)
+    _round1_validation_set = torch.utils.data.Subset(
+        dataset=dataset, indices=val_indices)
 
-validation_loader = torch.utils.data.DataLoader(dataset=validation_set,
-                                                batch_size=batch_size,
-                                                )
+    _round1_train_dataloader = torch.utils.data.DataLoader(
+        dataset=_round1_train_set, batch_size=batch_size, )
 
-unsup_loader = torch.utils.data.DataLoader(dataset=unsup_set,
-                                           batch_size=batch_size,
-                                           )
-
-train_sampler1 = torch.utils.data.SubsetRandomSampler(indices[:20000])
-validation_sampler1 = torch.utils.data.SubsetRandomSampler(indices[20000:25000])
+    _round1_validation_dataloader = torch.utils.data.DataLoader(
+        dataset=_round1_validation_set, batch_size=batch_size, )
+    return _round1_train_dataloader, _round1_validation_dataloader
 
 
-supervise_dataset = torch.utils.data.Subset(dataset=dataset, indices=indices[:supervise_size])
+def get_unlablled_dataloader():
+    _unlabelled_dataset = torch.utils.data.Subset(
+        dataset=dataset, indices=unsup_indices)
+    _unlabelled_dataloader = torch.utils.data.DataLoader(
+        dataset=_unlabelled_dataset, batch_size=batch_size, )
+    return _unlabelled_dataloader
 
-generate_dataset = CSVSet("D:\study\Code\python_codes\CNN\Pseudo-Labelling\mnist_generate.csv",
-                          False)
 
-round2_dataset = torch.utils.data.ConcatDataset([supervise_dataset, generate_dataset])
+# 第二轮data_loader
+def get_round2_dataloader():
+    _supervise_dataset = torch.utils.data.Subset(
+        dataset=dataset, indices=indices[:supervise_size])
+    _generate_dataset = CSVSet(
+        os.getcwd() + "\mnist_in_csv\mnist_generate.csv", False)
+    # 合并监督学习数据集和生成的数据集
+    _round2_dataset = torch.utils.data.ConcatDataset(
+        [_supervise_dataset, _generate_dataset])
+    _round2_train_index, _round2_validaton_index = shuffle_dataset()
+
+    _round2_train_dataset = torch.utils.data.Subset(dataset=_round2_dataset,
+                                                    indices=_round2_train_index)
+    _round2_validation_dataset = torch.utils.data.Subset(
+        dataset=_round2_dataset, indices=_round2_validaton_index)
+
+    _round2_train_dataloader = torch.utils.data.DataLoader(
+        dataset=_round2_train_dataset, batch_size=batch_size)
+    _round2_validation_dataloader = torch.utils.data.DataLoader(
+        dataset=_round2_validation_dataset, batch_size=batch_size)
+    return _round2_train_dataloader, _round2_validation_dataloader
 
 
+# 打乱数据集
 def shuffle_dataset():
     train_index = []
     size = dataset_size * train_rate
@@ -96,19 +121,8 @@ def shuffle_dataset():
     return train_index, validaton_index
 
 
-train_index, validaton_index = shuffle_dataset()
-
-round2_train_dataset = torch.utils.data.Subset(dataset=round2_dataset,
-                                               indices=train_index)
-round2_validation_dataset = torch.utils.data.Subset(dataset=round2_dataset,
-                                                    indices=validaton_index)
-
-round2_train_dataloader = torch.utils.data.DataLoader(dataset=round2_train_dataset,
-                                                      batch_size=batch_size)
-round2_validation_dataloader = torch.utils.data.DataLoader(dataset=round2_validation_dataset,
-                                                           batch_size=batch_size)
-
-def label_to_file(label, img, generate_file):
+# 将生成的数据写到文件
+def label_to_file(label, img, filepath):
     data_frame = []
     for j, _ in enumerate(label):
         label_part = [label[j]]
@@ -117,5 +131,5 @@ def label_to_file(label, img, generate_file):
         data = tuple(label_part)
         data_frame.append(data)
     data = pd.DataFrame(data_frame, index=range(len(label)))
-    data.to_csv(generate_file, index=False, header=False)
-
+    data.to_csv(filepath, index=False, header=False)
+    print("Parameters are save in path " + filepath)
