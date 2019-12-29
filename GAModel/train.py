@@ -27,4 +27,4 @@ g.run()
 
 g.run()
 
-write_performance(g.evaluation_history, 'SteadyStateGA_MNIST.txt')
+write_performance(g.evaluation_history, 'Performance.txt')

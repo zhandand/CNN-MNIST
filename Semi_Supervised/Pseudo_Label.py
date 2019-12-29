@@ -48,7 +48,7 @@ class PLModel:
             round2_train_dataloader,
             round2_validation_dataloader,
             loadParametersPath=os.getcwd() + '\parameters\\round1_parameters.pkl',
-            saveParametersPath=os.getcwd() + "paramters\\round2_paramters.pkl")
+            saveParametersPath=os.getcwd() + "\paramters\\round2_paramters.pkl")
 
     def train(self, train_dataloader, validation_dataloader,
               loadParametersPath=None,
@@ -106,4 +106,9 @@ class PLModel:
                     100 * running_loss / (i * batch_size),
                     100 * running_correct / (i * batch_size),
                     100 * testing_correct / (j * batch_size)))
-        torch.save(self.Model.state_dict(), saveParametersPath)
+        try:
+            torch.save(self.Model.state_dict(), saveParametersPath)
+        except FileNotFoundError:
+            print("Save Path Invalid!")
+        else:
+            print("Save parameters Success!")

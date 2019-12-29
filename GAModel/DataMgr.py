@@ -15,7 +15,7 @@ def load_mnist():
 
 
 def write_performance(perf, filename):
-    with open(filename, 'Pseudo-Labelling-bak+') as f:
+    with open(filename, os.getcwd() + 'Performance.txt') as f:
         text = 'iter\tbest_pop\tbest_loss\tbest_acc\tavg_fitness\n'
         for e in perf:
             text += ('\t'.join(list(map(str, [e['iter'], e['best_fit']['pop'], e['best_fit']['train_loss'],

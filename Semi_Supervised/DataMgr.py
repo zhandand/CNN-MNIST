@@ -63,10 +63,14 @@ def get_round1_dataloader():
         dataset=dataset, indices=val_indices)
 
     _round1_train_dataloader = torch.utils.data.DataLoader(
-        dataset=_round1_train_set, batch_size=batch_size, )
+        dataset=_round1_train_set,
+        batch_size=batch_size,
+        drop_last=True)
 
     _round1_validation_dataloader = torch.utils.data.DataLoader(
-        dataset=_round1_validation_set, batch_size=batch_size, )
+        dataset=_round1_validation_set,
+        batch_size=batch_size,
+        drop_last=True)
     return _round1_train_dataloader, _round1_validation_dataloader
 
 
@@ -74,7 +78,9 @@ def get_unlablled_dataloader():
     _unlabelled_dataset = torch.utils.data.Subset(
         dataset=dataset, indices=unsup_indices)
     _unlabelled_dataloader = torch.utils.data.DataLoader(
-        dataset=_unlabelled_dataset, batch_size=batch_size, )
+        dataset=_unlabelled_dataset,
+        batch_size=batch_size,
+        drop_last=True)
     return _unlabelled_dataloader
 
 
@@ -90,14 +96,19 @@ def get_round2_dataloader():
     _round2_train_index, _round2_validaton_index = shuffle_dataset()
 
     _round2_train_dataset = torch.utils.data.Subset(dataset=_round2_dataset,
-                                                    indices=_round2_train_index)
+                                                    indices=_round2_train_index, )
     _round2_validation_dataset = torch.utils.data.Subset(
         dataset=_round2_dataset, indices=_round2_validaton_index)
 
     _round2_train_dataloader = torch.utils.data.DataLoader(
-        dataset=_round2_train_dataset, batch_size=batch_size)
+        dataset=_round2_train_dataset,
+        batch_size=batch_size,
+        drop_last=True
+    )
     _round2_validation_dataloader = torch.utils.data.DataLoader(
-        dataset=_round2_validation_dataset, batch_size=batch_size)
+        dataset=_round2_validation_dataset,
+        batch_size=batch_size,
+        drop_last=True)
     return _round2_train_dataloader, _round2_validation_dataloader
 
 
@@ -131,5 +142,9 @@ def label_to_file(label, img, filepath):
         data = tuple(label_part)
         data_frame.append(data)
     data = pd.DataFrame(data_frame, index=range(len(label)))
-    data.to_csv(filepath, index=False, header=False)
-    print("Parameters are save in path " + filepath)
+    try:
+        data.to_csv(filepath, index=False, header=False)
+    except FileNotFoundError:
+        print("File name Invalid")
+    else:
+        print("Parameters are save in path " + filepath)
