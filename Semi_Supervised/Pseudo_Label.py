@@ -52,7 +52,7 @@ class PLModel:
 
     def train(self, train_dataloader, validation_dataloader,
               loadParametersPath=None,
-              saveParametersPath=os.getcwd() + "paramters\\paramters.pkl"):
+              saveParametersPath=os.getcwd() + "\paramters\\paramters.pkl"):
 
         cost = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(self.Model.parameters())
@@ -88,7 +88,7 @@ class PLModel:
                 running_correct += torch.sum(pred == y_train).item()
                 i += 1
                 if i % 20 == 0:
-                    print("Trained {.4f} Training Accuracy:".format
+                    print("Trained {:d} Training Accuracy:{:.4f}".format
                           (i * batch_size, running_correct / (i * batch_size)))
 
             j = 0;
@@ -106,4 +106,4 @@ class PLModel:
                     100 * running_loss / (i * batch_size),
                     100 * running_correct / (i * batch_size),
                     100 * testing_correct / (j * batch_size)))
-            torch.save(self.Model.state_dict(), saveParametersPath)
+        torch.save(self.Model.state_dict(), saveParametersPath)
