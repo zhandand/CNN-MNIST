@@ -19,12 +19,10 @@ g = SteadyStateGA(
     _r_mutation=0.1,
     _p_crossover=0.7,
     _p_mutation=0,  # no use
-    _max_iter=10,
+    _max_iter=50,
     _min_fitness=0.95,
     _batch_size=5000,
 )
-g.run()
-
 g.run()
 
 write_performance(g.evaluation_history, 'Performance.txt')

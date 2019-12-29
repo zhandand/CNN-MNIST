@@ -21,9 +21,8 @@ class SteadyStateGA(GA.GA):
                     self.evaluation(X_batch, y_batch)
                 child = self.selection()
                 self.replacement(child)
-                if self.cur_iter >= self.max_iter:
+                if (self.cur_iter == self.max_iter):
                     print('Maximum iterations({}) reached.'.format(self.max_iter))
-
                     return
                 if self.evaluation_history[-1]['best_fit']['train_acc'] >= self.min_fitness:
                     print('Minimum fitness({}) reached.'.format(self.min_fitness))
