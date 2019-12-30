@@ -16,10 +16,10 @@ g = SteadyStateGA(
     _X_test=X_test[:test_size],
     _y_test=y_test[:test_size],
     _pop_size=20,
-    _r_mutation=0.1,
+    _r_mutation=0.5,
     _p_crossover=0.7,
-    _p_mutation=0.5,
-    _max_iter=50,
+    _p_mutation=0.6,
+    _max_iter=100,
     _min_fitness=0.95,
     _batch_size=5000,
 )

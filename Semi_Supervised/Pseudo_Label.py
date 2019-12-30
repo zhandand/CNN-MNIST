@@ -92,7 +92,7 @@ class PLModel:
                 running_loss += loss.item()
                 running_correct += torch.sum(pred == y_train).item()
                 i += 1
-                self.writer.add_scalar('loss', running_correct / (i * batch_size), global_step=epoch)
+                self.writer.add_scalar('running_correct', running_correct / (i * batch_size), global_step=epoch)
                 if i % 20 == 0:
                     print("Trained {:d} Training Accuracy:{:.4f}".format
                           (i * batch_size, running_correct / (i * batch_size)))

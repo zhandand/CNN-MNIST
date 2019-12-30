@@ -59,7 +59,7 @@ def get_round1_dataloader():
     _round1_train_set = torch.utils.data.Subset(
         dataset=dataset, indices=train_indices)
     _round1_validation_set = torch.utils.data.Subset(
-        dataset=dataset, indices=val_indices)
+        dataset=dataset, indices=val_indices, )
 
     _round1_train_dataloader = torch.utils.data.DataLoader(
         dataset=_round1_train_set,

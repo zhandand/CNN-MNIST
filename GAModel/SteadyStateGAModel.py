@@ -55,7 +55,7 @@ class SteadyStateGA(GA.GA):
             if type(layer1) is Conv2D:
                 child.add(layer1 if np.random.rand() < 0.5 else layer2)
             elif type(layer1) is Dense:
-                weights1 = layer1.get_weights()[0]  # only the kernel weights
+                weights1 = layer1.get_weights()[0]
                 weights2 = layer2.get_weights()[0]
                 rand1 = np.random.randint(0, 2, weights1.shape[1])  # cols
                 rand2 = 1 - rand1
@@ -81,7 +81,6 @@ class SteadyStateGA(GA.GA):
             elif type(layer) is Dense:
                 weights = layer.get_weights()[0]
                 rand = np.where(np.random.rand(weights.shape[1]) < self.r_mutation, 1, 0)
-
                 layer.set_weights([weights + rand * np.random.normal(0, self.stddev, weights.shape)])
                 child.add(layer)
             else:
