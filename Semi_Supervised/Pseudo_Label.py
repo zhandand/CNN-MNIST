@@ -106,7 +106,7 @@ class PLModel:
                 self.writer.add_scalar('accuracy', testing_correct)
 
             self.writer.add_scalar('loss', 100 * running_loss / (i * batch_size))
-            for i, (name, param) in enumerate(self.Model.named_parameters()):
+            for k, (name, param) in enumerate(self.Model.named_parameters()):
                 self.writer.add_histogram(name, param, 0)
             print(
                 "Loss is:{:.4f}, Train Accuracy is:"
