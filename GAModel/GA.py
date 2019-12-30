@@ -25,6 +25,7 @@ class GA:
         self.stddev = 0.5
         self.loss_func = 'categorical_crossentropy'
         self.metrics = ['accuracy']
+        self.best_acc = []
 
     @property
     def cur_iter(self):
@@ -51,13 +52,16 @@ class GA:
 
     def evaluation(self, _X, _y, _is_batch=True):
         cur_evaluation = []
+        best_acc = 0
         for i in range(self.pop_size):
             model = self.chroms[i]
             model.compile(loss=self.loss_func, metrics=self.metrics, optimizer='adam')
-
             train_loss, train_acc = model.evaluate(_X, _y, verbose=0)
             if not _is_batch:
                 test_loss, test_acc = model.evaluate(self.X_test, self.y_test, verbose=0)
+                if test_acc > best_acc:
+                    best_acc = test_acc
+
                 cur_evaluation.append({
                     'pop': i,
                     'train_loss': round(train_loss, 4),
@@ -71,6 +75,8 @@ class GA:
                     'train_loss': round(train_loss, 4),
                     'train_acc': round(train_acc, 4),
                 })
+
+        self.best_acc.append(best_acc)
         best_fit = sorted(cur_evaluation, key=lambda x: x['train_acc'])[-1]
         self.evaluation_history.append({
             'iter': self.cur_iter + 1,

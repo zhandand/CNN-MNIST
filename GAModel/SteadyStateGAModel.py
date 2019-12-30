@@ -23,6 +23,7 @@ class SteadyStateGA(GA.GA):
                 self.replacement(child)
                 if (self.cur_iter == self.max_iter):
                     print('Maximum iterations({}) reached.'.format(self.max_iter))
+
                     return
                 if self.evaluation_history[-1]['best_fit']['train_acc'] >= self.min_fitness:
                     print('Minimum fitness({}) reached.'.format(self.min_fitness))
@@ -58,8 +59,7 @@ class SteadyStateGA(GA.GA):
                 weights2 = layer2.get_weights()[0]
                 rand1 = np.random.randint(0, 2, weights1.shape[1])  # cols
                 rand2 = 1 - rand1
-
-                layer1.set_weights([weights1 * rand1 + weights2 * rand2])  # wrong
+                layer1.set_weights([weights1 * rand1 + weights2 * rand2])
                 child.add(layer1)
             else:
                 child.add(layer1)
