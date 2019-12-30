@@ -46,7 +46,6 @@ class CSVSet(torch.utils.data.Dataset):
         imgSet = [img[1:] for img in self.rows[supervise_size:]]
         return imgSet
 
-
 dataset = CSVSet(datapath)
 
 # 按照一定的比例划分数据集

@@ -11,7 +11,7 @@ class PLModel:
     def __init__(self, _Model, _parametersFileName="model_parameter.pkl", ):
         self.Model = _Model
         self.parametersFileName = _parametersFileName
-        self.writer = SummaryWriter(os.getcwd() + "\\visualization_tool\\log")
+        self.writer = SummaryWriter(os.getcwd() + ".\log")
 
 
     def train_round1(self, round1_train_dataloader, round1_validation_dataloader):
@@ -50,7 +50,7 @@ class PLModel:
             round2_train_dataloader,
             round2_validation_dataloader,
             loadParametersPath=os.getcwd() + '\parameters\\round1_parameters.pkl',
-            saveParametersPath=os.getcwd() + "\paramters\\round2_paramters.pkl")
+            saveParametersPath=os.getcwd() + "\parameters\\round2_paramters.pkl")
 
     def train(self, train_dataloader, validation_dataloader,
               loadParametersPath=None,
@@ -77,8 +77,9 @@ class PLModel:
             i = 0
             for data in train_dataloader:
                 x_train, y_train = data
-                self.writer.add_graph(self.Model, input_to_model=x_train)
-                self.writer.add_images(tag='image', img_tensor=x_train, dataformats='NCHW')
+                if i == 0:
+                    self.writer.add_graph(self.Model, input_to_model=x_train)
+                    self.writer.add_images(tag='raw image', img_tensor=x_train, dataformats='NCHW')
                 outputs = self.Model(x_train)
                 pred = torch.max(outputs.data, 1)[1].cuda().squeeze()
 
@@ -91,6 +92,7 @@ class PLModel:
                 running_loss += loss.item()
                 running_correct += torch.sum(pred == y_train).item()
                 i += 1
+                self.writer.add_scalar('loss', running_correct / (i * batch_size), global_step=epoch)
                 if i % 20 == 0:
                     print("Trained {:d} Training Accuracy:{:.4f}".format
                           (i * batch_size, running_correct / (i * batch_size)))
@@ -105,7 +107,6 @@ class PLModel:
                 testing_correct += torch.sum(pred == y_test).item()
                 self.writer.add_scalar('accuracy', testing_correct)
 
-            self.writer.add_scalar('loss', 100 * running_loss / (i * batch_size))
             for k, (name, param) in enumerate(self.Model.named_parameters()):
                 self.writer.add_histogram(name, param, 0)
             print(
